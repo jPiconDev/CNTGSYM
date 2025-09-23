@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <permission
+        android:name="edu.cas.PERMISO_APP"
+        android:label="permiso_personalizado"
+        android:protectionLevel="normal" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,6 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CNTGSYM">
+        <activity
+            android:name=".ActividadB"
+            android:permission="edu.cas.PERMISO_APP"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="edu.cas.cntgsym.Saludo"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">
