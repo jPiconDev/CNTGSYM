@@ -10,11 +10,18 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.PICK" />
-            <data android:scheme="content"
-                  android:host="com.android.contacts"
-                />
+            <data
+                android:host="com.android.contacts"
+                android:pathPrefix="/data/phones"
+                android:scheme="content" />
         </intent>
     </queries>
+
+    <!--query más general para el mismo propósito-->
+    <queries>
+        <provider android:authorities="com.android.contacts" />
+    </queries>
+
 
     <permission
         android:name="edu.cas.PERMISO_APP"
