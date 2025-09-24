@@ -1,8 +1,13 @@
 package edu.cas.cntgsym.contactos
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import edu.cas.cntgsym.R
@@ -14,6 +19,7 @@ import edu.cas.cntgsym.R
  * SÍ NECESITARÉ PERMISOS
  */
 class SeleccionContactosActivityPermisos : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,5 +29,26 @@ class SeleccionContactosActivityPermisos : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        //SI TENGO PERMISOS, LEO LOS CONTACTOS
+        //SI NO, PIDO PERMISOS
+        //OJO: si mi app va orientada minSdk a apps anteriores a 23, no tengo que pedir permisos
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), 500)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults[0]== PackageManager.PERMISSION_GRANTED)
+        {
+            Log.d("MIAPP", "Permiso de Leer contactos concedidos")
+            //TODO completar llamada para consulta
+        } else {
+            Log.d("MIAPP", "Permiso de Leer contactos DENEGADO")
+            Toast.makeText(this, "Permiso de Leer contactos DENEGADO", Toast.LENGTH_LONG).show()
+        }
+
     }
 }
