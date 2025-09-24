@@ -2,6 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- con estos elementos, estaríamos desbloquedano la búsqueda de apps candidatas
+    a la hora de lanzar un intent implícito con estos valores: en este caso: seleccionar un
+    telefóno del Content provider de contactos
+    //TODO completar content://com.android.contacts/data/phones
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data android:scheme="content"
+                  android:host="com.android.contacts"
+                />
+        </intent>
+    </queries>
+
     <permission
         android:name="edu.cas.PERMISO_APP"
         android:label="permiso_personalizado"
