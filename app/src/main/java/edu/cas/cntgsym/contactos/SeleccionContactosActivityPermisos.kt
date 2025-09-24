@@ -3,6 +3,7 @@ package edu.cas.cntgsym.contactos
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -44,11 +45,31 @@ class SeleccionContactosActivityPermisos : AppCompatActivity() {
         if (grantResults[0]== PackageManager.PERMISSION_GRANTED)
         {
             Log.d("MIAPP", "Permiso de Leer contactos concedidos")
-            //TODO completar llamada para consulta
+            leerTodosLosTelefonos()
         } else {
             Log.d("MIAPP", "Permiso de Leer contactos DENEGADO")
             Toast.makeText(this, "Permiso de Leer contactos DENEGADO", Toast.LENGTH_LONG).show()
         }
 
+    }
+
+    private fun leerTodosLosTelefonos() {
+        //VAMOS A LEER TODOS LOS CONTACTOS
+        val cursorTelefonos = contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null,
+            null,
+            null,
+            null)
+
+        var nColumna = 0
+        var numero = ""
+        while (cursorTelefonos!!.moveToNext())
+        {
+            nColumna = cursorTelefonos.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            numero = cursorTelefonos.getString(nColumna)
+            Log.d("MIAPP", "TELEFONO $numero")
+        }
+        cursorTelefonos.close()
     }
 }
