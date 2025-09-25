@@ -20,6 +20,19 @@
         </intent>
     </queries>
 
+    <!-- puede ser util para que no se esconda ninguna app para el buscador de intents
+    o listado de apps. con esto, me tendría que salir todas las apps -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+
+
+
+
     <!--query más general para el mismo propósito-->
     <queries>
         <provider android:authorities="com.android.contacts" />
@@ -59,7 +72,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
+            <!-- SI COMENTAÍS ESTAS LÍNEAS, VUESTRA APP SE INSTALA
+            PERO NO TIENE ACCESO DIRECTO DESDE EL ESCRITORIO-->
+             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
