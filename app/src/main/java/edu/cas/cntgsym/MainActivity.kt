@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
        // startActivity(Intent(this, SeleccionContactosActivity::class.java))
        // startActivity(Intent(this, SeleccionContactosActivityPermisos::class.java))
+        Log.v(Constantes.ETIQUETA_LOG, "PRUEBA LOG VERBOSE")
         mostrarAppsInstaladas()
     }
 
