@@ -2,6 +2,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+    <!-- con estos elementos, estaríamos desbloquedano la búsqueda de apps candidatas
+    a la hora de lanzar un intent implícito con estos valores: en este caso: seleccionar un
+    telefóno del Content provider de contactos
+    Este filtrado es a partir de ANDROID 11
+    https://developer.android.com/training/package-visibility?hl=es-419
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data
+                android:host="com.android.contacts"
+                android:pathPrefix="/data/phones"
+                android:scheme="content" />
+        </intent>
+    </queries>
+
+    <!--query más general para el mismo propósito-->
+    <queries>
+        <provider android:authorities="com.android.contacts" />
+    </queries>
+
+
     <permission
         android:name="edu.cas.PERMISO_APP"
         android:label="permiso_personalizado"
@@ -27,7 +51,7 @@
             android:exported="true"
             android:permission="edu.cas.PERMISO_APP">
             <intent-filter>
-                <action android:name=".Saludo" />
+                <action android:name="edu.cas.cntgsym.Saludo" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
