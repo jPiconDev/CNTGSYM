@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="visibilidad">
+        <item>visible</item>
+        <item>invisible</item>
+        <item>gone</item>
+    </string-array>
+</resources>
