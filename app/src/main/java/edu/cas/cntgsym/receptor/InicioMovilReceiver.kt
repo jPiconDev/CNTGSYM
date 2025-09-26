@@ -11,8 +11,9 @@ class InicioMovilReceiver : BroadcastReceiver() {
 
     //mi idea que cuando se inicie el teléfono este métod sea invocado automáticamente
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(Constantes.ETIQUETA_LOG, "en InicioMovilReceiver")
-        //TODO lanzaremos una notifación Y SOLICITAR ACTIVACIÓN DE INICIO AUTOMÁTICO POR intent en ajustes
+        Log.d(Constantes.ETIQUETA_LOG, "en InicioMovilReceiver action = ${intent.action}")
+        //TODO ver el inicio automático en PIXEL
+        //EVITAR PEDIR AL USUARIO EL INICIO AUTOMÁTICO CADA VEZ
         Notificaciones.lanzarNotificacion(context)
 
     }
