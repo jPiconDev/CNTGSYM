@@ -20,6 +20,7 @@ import edu.cas.cntgsym.contactos.SeleccionContactosActivity
 import edu.cas.cntgsym.contactos.SeleccionContactosActivityPermisos
 import edu.cas.cntgsym.util.Constantes
 import androidx.core.content.edit
+import edu.cas.cntgsym.persistenciavector.SpinnerVectorActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
        // startActivity(Intent(this, SeleccionContactosActivity::class.java))
        // startActivity(Intent(this, SeleccionContactosActivityPermisos::class.java))
+        startActivity(Intent(this, SpinnerVectorActivity::class.java))
         //Log.v(Constantes.ETIQUETA_LOG, "PRUEBA LOG VERBOSE")
         //mostrarAppsInstaladas()
         val ficheroPreferencias = getSharedPreferences(Constantes.FICHERO_PREFS_AJUSTES, MODE_PRIVATE)
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         gestionarPermisosNotis()
+
     }
 
     fun mostrarAppsInstaladas ()
