@@ -1,6 +1,5 @@
 package edu.cas.cntgsym.util
 
-import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,11 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.AudioAttributes
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import edu.cas.cntgsym.MainActivity
 import edu.cas.cntgsym.R
 
@@ -55,7 +54,7 @@ object Notificaciones {
             .build()
 
         notificationChannel.setSound(
-            Uri.parse("android.resource://" + context.packageName + "/" + R.raw.snd_noti),
+            ("android.resource://" + context.packageName + "/" + R.raw.snd_noti).toUri(),
             audioAttributes
         )
 
@@ -76,13 +75,13 @@ object Notificaciones {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
-            var notificationChannel =
+            val notificationChannel =
                 Notificaciones.crearCanalNotificacion(context)
             notificationManager.createNotificationChannel(notificationChannel!!)
         }
 
         //CREAMOS LA NOTIFICACIÓN
-        var nb = NotificationCompat.Builder(context,
+        val nb = NotificationCompat.Builder(context,
             NOTIFICATION_CHANNEL_ID
         )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -95,6 +94,12 @@ object Notificaciones {
             .setAutoCancel(true)//es para que cuando toque la noti, desaparezca
             .setDefaults(Notification.DEFAULT_ALL)
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+        {
+            //nb.setSound(Uri.parse("android.resource://" + context.packageName + "/" + R.raw.snd_noti))
+            nb.setSound(("android.resource://" + context.packageName + "/" + R.raw.snd_noti).toUri())
+        }
+
         val intentDestino = Intent(context, MainActivity::class.java)
         //pendingIntent -- iNTENT "SECURIZADO" -- permite lanzar el intent, como si estuviera dentro de mi app
         val pendingIntent = PendingIntent.getActivity(context, 100,
@@ -102,16 +107,13 @@ object Notificaciones {
         nb.setContentIntent(pendingIntent)//asocio el intent a la notificación
         //si estoy en api anteriore, debo setea el sonido fuera porque no hay canal
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        {
-            nb.setSound(Uri.parse
-                ("android.resource://" + context.packageName + "/" + R.raw.snd_noti))
-        }
+
 
         val notificacion = nb.build()
 
         //ADD PERMISOS
         notificationManager.notify(500, notificacion)
+        Log.d(Constantes.ETIQUETA_LOG, "Notificación Lanzada")
 
     }
 }
