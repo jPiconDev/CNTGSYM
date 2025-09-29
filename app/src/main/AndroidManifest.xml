@@ -57,6 +57,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CNTGSYM">
         <activity
+            android:name=".formulario.FormularioActivity"
+            android:exported="false" />
+        <activity
             android:name=".persistenciavector.SpinnerVectorActivity"
             android:exported="false" />
 
