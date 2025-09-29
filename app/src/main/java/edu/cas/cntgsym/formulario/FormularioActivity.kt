@@ -21,6 +21,8 @@ import edu.cas.cntgsym.databinding.ActivityFormularioBinding
 import edu.cas.cntgsym.formulario.model.Usuario
 import edu.cas.cntgsym.formulario.preferences.PreferenciasUsuario
 import edu.cas.cntgsym.util.Constantes
+import java.io.File
+import java.io.FileOutputStream
 
 class FormularioActivity : AppCompatActivity() {
 
@@ -37,10 +39,30 @@ class FormularioActivity : AppCompatActivity() {
             binding.imagenFormulario.setImageURI(result.data?.data)
             binding.imagenFormulario.scaleType = ImageView.ScaleType.CENTER_CROP
 
-            binding.imagenFormulario.tag = result.data?.data
+
+            val uriLocal =  copiarImagenAMemoriaInterna(result.data?.data!!)
+            Log.d(Constantes.ETIQUETA_LOG, "Ruta de la copia = $uriLocal ")
+
+            binding.imagenFormulario.tag = uriLocal
 
 
         }
+    }
+
+    fun copiarImagenAMemoriaInterna(uriContent : Uri): Uri {
+        val nombreArchivo = "imagen_formulario_perfil.jpg"
+        //aquí escribo
+        val archivoSalida = File(filesDir, nombreArchivo)
+        val outputStream = FileOutputStream(archivoSalida)//escribir fichero de bytes / reader/writer trabajar con texto
+        //leo
+        val archivoGaleria = contentResolver.openInputStream(uriContent)
+
+
+        archivoGaleria?.copyTo(outputStream)
+        archivoGaleria?.close()
+
+        return Uri.fromFile(archivoSalida)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -146,7 +168,7 @@ class FormularioActivity : AppCompatActivity() {
 private fun FormularioActivity.seleccionarFoto() {
    //TODO lanzar el intent para seleccionar una foto de la galería/del dispoistivo
     val intentGaleria = Intent(Intent.ACTION_PICK)
-    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//seleccionar un documento
+    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//TODO probar seleccionar un documento
     intentGaleria.type = "image/*" //quiero obtener una foto
 
     if (intentGaleria.resolveActivity(packageManager)!=null)
