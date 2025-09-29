@@ -92,6 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="GUARDAR"
+        android:onClick="guardarUsuario"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
@@ -101,6 +102,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:onClick="borrarUsuario"
         android:text="BORRAR"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
