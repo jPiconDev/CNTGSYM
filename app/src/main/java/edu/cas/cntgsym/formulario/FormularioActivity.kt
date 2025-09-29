@@ -1,10 +1,14 @@
 package edu.cas.cntgsym.formulario
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -20,6 +24,19 @@ import edu.cas.cntgsym.util.Constantes
 class FormularioActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityFormularioBinding
+    var lanzadorIntentImagen: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()){
+        //gestionar la vuelta de la selección de foto
+        result ->
+        if (result.resultCode==RESULT_OK){
+            Log.d(Constantes.ETIQUETA_LOG, "El usuario ha seleccionado una foto")
+            Log.d(Constantes.ETIQUETA_LOG, "URI Foto seleccianada ${result.data?.data} ")
+            binding.imagenFormulario.setImageURI(result.data?.data)
+            binding.imagenFormulario.scaleType = ImageView.ScaleType.CENTER_CROP
+
+
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +59,10 @@ class FormularioActivity : AppCompatActivity() {
                 }
             }
 
+        }
+
+        binding.imagenFormulario.setOnClickListener {
+            imagen -> seleccionarFoto()
         }
     }
 
@@ -85,4 +106,20 @@ class FormularioActivity : AppCompatActivity() {
 
 
 
+}
+
+private fun FormularioActivity.seleccionarFoto() {
+   //TODO lanzar el intent para seleccionar una foto de la galería/del dispoistivo
+    val intentGaleria = Intent(Intent.ACTION_PICK)
+    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//seleccionar un documento
+    intentGaleria.type = "image/*" //quiero obtener una foto
+
+    if (intentGaleria.resolveActivity(packageManager)!=null)
+    {
+        Log.d(Constantes.ETIQUETA_LOG, "Hay al menos una app que puede ofrecer imágenes")
+        lanzadorIntentImagen.launch(intentGaleria)
+    } else {
+        Log.d(Constantes.ETIQUETA_LOG, "NO HAY una app que puede ofrecer imágenes")
+        Toast.makeText(this, "SIN APPS DE IMÁGENES", Toast.LENGTH_LONG).show()
+    }
 }

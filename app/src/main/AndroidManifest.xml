@@ -26,6 +26,15 @@
                 android:scheme="content" />
         </intent>
     </queries>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+
+            <data
+                android:mimeType="image/*" />
+        </intent>
+    </queries>
     <!--
  puede ser util para que no se esconda ninguna app para el buscador de intents
     o listado de apps. con esto, me tendría que salir todas las apps
