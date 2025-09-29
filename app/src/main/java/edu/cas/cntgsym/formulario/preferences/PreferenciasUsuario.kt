@@ -23,6 +23,7 @@ object PreferenciasUsuario {
 
     fun borrarUsuarioPreferences (context: Context)
     {
-
+        val fichero_prefs = context.getSharedPreferences(NOMBRE_FICHERO_USUARIO, Context.MODE_PRIVATE)
+        fichero_prefs.edit(commit = true) { clear() }
     }
-}
+  }
