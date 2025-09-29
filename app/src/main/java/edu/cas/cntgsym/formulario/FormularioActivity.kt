@@ -1,6 +1,7 @@
 package edu.cas.cntgsym.formulario
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,6 +25,8 @@ import edu.cas.cntgsym.util.Constantes
 class FormularioActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityFormularioBinding
+    lateinit var usuario: Usuario
+
     var lanzadorIntentImagen: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
         //gestionar la vuelta de la selección de foto
@@ -33,6 +36,8 @@ class FormularioActivity : AppCompatActivity() {
             Log.d(Constantes.ETIQUETA_LOG, "URI Foto seleccianada ${result.data?.data} ")
             binding.imagenFormulario.setImageURI(result.data?.data)
             binding.imagenFormulario.scaleType = ImageView.ScaleType.CENTER_CROP
+
+            binding.imagenFormulario.tag = result.data?.data
 
 
         }
@@ -64,6 +69,35 @@ class FormularioActivity : AppCompatActivity() {
         binding.imagenFormulario.setOnClickListener {
             imagen -> seleccionarFoto()
         }
+
+        initiActivity()
+    }
+
+    private fun initiActivity() {
+        //Completar el Estado de la actividad
+        //si tengo fichero de preferencias, lo recuperamos y lo hacemos visible/lo cargamos
+        if (!PreferenciasUsuario.ficheroUsuarioVacio(this))
+        {
+            cargarDatosFichero()
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "El fichero está vacío")
+        }
+    }
+
+    fun cargarDatosFichero()
+    {
+        this.usuario = PreferenciasUsuario.cargarUsuario(this)
+        Log.d(Constantes.ETIQUETA_LOG, "Usuario cargado = $usuario")
+        binding.editTextNombreFormulario.setText(this.usuario.nombre)
+        binding.editTextEdadFormulario.setText(this.usuario.edad.toString())
+        if (this.usuario.sexo=='M')
+        {
+            binding.radioButtonHombre.isChecked = true
+        } else {
+            binding.radioButtonMujer.isChecked = true
+        }
+
+        binding.imagenFormulario.setImageURI(this.usuario.uriFoto.toUri())
     }
 
     fun esNombreValido (nombre:String): Boolean
@@ -84,7 +118,8 @@ class FormularioActivity : AppCompatActivity() {
         {
             "" //sin foto
         } else {
-            binding.imagenFormulario.tag as String
+             val uritag = binding.imagenFormulario.tag as Uri
+             uritag.toString()
         }
         val usuario = Usuario(nombre, edad, sexo, uriFoto)
         PreferenciasUsuario.guardarUsuarioPreferences(usuario, this)
