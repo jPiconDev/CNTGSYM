@@ -1,14 +1,17 @@
 package edu.cas.cntgsym.foto
 
+import android.app.Instrumentation
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -42,7 +45,48 @@ class FotoActivity : AppCompatActivity() {
         }
     }
 
+
+    //otra forma de expresarlo con función anónima
+    val launcherIntentFoto2 = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        fun(resultado) {
+            if (resultado.resultCode == RESULT_OK) {
+                Log.d(Constantes.ETIQUETA_LOG, "La foto fue bien")
+                binding.fotoTomada.setImageURI(this.uriFotoPublica)
+                //acuatlizarGaleria()
+            } else {
+                Log.d(Constantes.ETIQUETA_LOG, "La foto fue mal")
+            }
+        }
+    )
+
+//TODO revisar fallo
+    /*val launcherIntentFoto3 = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        FotoActivity::postIntentFoto //function reference
+    )
+
+    fun postIntentFoto (resultado: ActivityResult): Unit
+    {
+        if (resultado.resultCode == RESULT_OK) {
+            Log.d(Constantes.ETIQUETA_LOG, "La foto fue bien")
+            binding.fotoTomada.setImageURI(this.uriFotoPublica)
+            //acuatlizarGaleria()
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "La foto fue mal")
+        }
+    }*/
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        //este métod o se invoca antes de que la activdad muera / antes de recearse
+        outState.putString("URI", this.uriFotoPublica.toString())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         binding = ActivityFotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -73,8 +117,7 @@ class FotoActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults[0]==PackageManager.PERMISSION_GRANTED)
-        {
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(Constantes.ETIQUETA_LOG, "PERMISO CÁMARA CONCEDIDO")
             lanzarCamara()
         } else {
@@ -91,6 +134,7 @@ class FotoActivity : AppCompatActivity() {
         uri?.let { //si la uri es != null, se ejecuta la función let
             val intentFoto = Intent()
             intentFoto.setAction(MediaStore.ACTION_IMAGE_CAPTURE)
+            //intentFoto.putExtra(MediaStore.EXTRA_OUTPUT, this.uriFotoPublica)
             intentFoto.putExtra(MediaStore.EXTRA_OUTPUT, this.uriFotoPublica)
             this.launcherIntentFoto.launch(intentFoto)
         } ?: run { //si la uri es null, se ejecuta la función este otro bloque
@@ -98,13 +142,14 @@ class FotoActivity : AppCompatActivity() {
         }
     }
 
-    private fun crearFicheroDestino():Uri?{
+    private fun crearFicheroDestino(): Uri? {
         val fechaActual = Date()
         val momentoActual = SimpleDateFormat("yyyyMMdd_HHmmss").format(fechaActual)
         val nombreFichero = "FOTO_CNT_$momentoActual.jpg"
 
         //var rutaFoto = "${filesDir.path}/$nombreFichero" //MEMORIA INTERNA /data file:///data/user/0/edu.cas.cntgsym/files/FOTO_CNT_20250930_185107.jpg
-        var rutaFoto = "${getExternalFilesDir(null)}/$nombreFichero" //MEMORIA EXTERNA PROPIA /sdcard file:///storage/emulated/0/Android/data/edu.cas.cntgsym/files/FOTO_CNT_20250930_185738.jpg
+        var rutaFoto =
+            "${getExternalFilesDir(null)}/$nombreFichero" //MEMORIA EXTERNA PROPIA /sdcard file:///storage/emulated/0/Android/data/edu.cas.cntgsym/files/FOTO_CNT_20250930_185738.jpg
         val ficheroFoto = File(rutaFoto)
         try {
             ficheroFoto.createNewFile()
@@ -114,8 +159,7 @@ class FotoActivity : AppCompatActivity() {
             this.uriFotoPublica = FileProvider.getUriForFile(this, "edu.cas.cntgsym", ficheroFoto)
             Log.d(Constantes.ETIQUETA_LOG, "FICHERO CREADO URI PÚBLICA $uriFotoPublica")
 
-        } catch (e: Exception)
-        {
+        } catch (e: Exception) {
             Log.e(Constantes.ETIQUETA_LOG, "Error al crear el fichero destino de la foto", e)
         }
         return this.uriFotoPublica
