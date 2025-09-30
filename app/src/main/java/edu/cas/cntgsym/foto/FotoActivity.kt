@@ -1,18 +1,26 @@
 package edu.cas.cntgsym.foto
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import edu.cas.cntgsym.R
 import edu.cas.cntgsym.databinding.ActivityFotoBinding
 import edu.cas.cntgsym.util.Constantes
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class FotoActivity : AppCompatActivity() {
 
@@ -20,6 +28,19 @@ class FotoActivity : AppCompatActivity() {
 
     lateinit var uriFotoPrivada: Uri //file:// ruta privada de mi foto app
     lateinit var uriFotoPublica: Uri //content:// ruta pública de mi foto app
+
+    val launcherIntentFoto = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {
+        resultado ->
+        if (resultado.resultCode == RESULT_OK)
+        {
+            Log.d(Constantes.ETIQUETA_LOG, "La foto fue bien")
+            binding.fotoTomada.setImageURI(this.uriFotoPublica)
+            //acuatlizarGaleria()
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "La foto fue mal")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +86,38 @@ class FotoActivity : AppCompatActivity() {
 
     private fun lanzarCamara() {
         //1 crear el fichero Destino
+        val uri = crearFicheroDestino()
         //2 tirar el intent para hacer la foto con la uir del punto 1
+        uri?.let { //si la uri es != null, se ejecuta la función let
+            val intentFoto = Intent()
+            intentFoto.setAction(MediaStore.ACTION_IMAGE_CAPTURE)
+            intentFoto.putExtra(MediaStore.EXTRA_OUTPUT, this.uriFotoPublica)
+            this.launcherIntentFoto.launch(intentFoto)
+        } ?: run { //si la uri es null, se ejecuta la función este otro bloque
+            Toast.makeText(this, "NO FUE POSIBLE CREAR EL FICHERO", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun crearFicheroDestino():Uri?{
+        val fechaActual = Date()
+        val momentoActual = SimpleDateFormat("yyyyMMdd_HHmmss").format(fechaActual)
+        val nombreFichero = "FOTO_CNT_$momentoActual.jpg"
+
+        //var rutaFoto = "${filesDir.path}/$nombreFichero" //MEMORIA INTERNA /data file:///data/user/0/edu.cas.cntgsym/files/FOTO_CNT_20250930_185107.jpg
+        var rutaFoto = "${getExternalFilesDir(null)}/$nombreFichero" //MEMORIA EXTERNA PROPIA /sdcard file:///storage/emulated/0/Android/data/edu.cas.cntgsym/files/FOTO_CNT_20250930_185738.jpg
+        val ficheroFoto = File(rutaFoto)
+        try {
+            ficheroFoto.createNewFile()
+            this.uriFotoPrivada = ficheroFoto.toUri()
+            Log.d(Constantes.ETIQUETA_LOG, "FICHERO CREADO URI PRIVADA $uriFotoPrivada")
+            //tradúceme la ruta privada en la pública
+            this.uriFotoPublica = FileProvider.getUriForFile(this, "edu.cas.cntgsym", ficheroFoto)
+            Log.d(Constantes.ETIQUETA_LOG, "FICHERO CREADO URI PÚBLICA $uriFotoPublica")
+
+        } catch (e: Exception)
+        {
+            Log.e(Constantes.ETIQUETA_LOG, "Error al crear el fichero destino de la foto", e)
+        }
+        return this.uriFotoPublica
     }
 }
