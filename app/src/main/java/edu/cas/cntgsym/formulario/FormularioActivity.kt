@@ -1,6 +1,7 @@
 package edu.cas.cntgsym.formulario
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,10 +21,14 @@ import edu.cas.cntgsym.databinding.ActivityFormularioBinding
 import edu.cas.cntgsym.formulario.model.Usuario
 import edu.cas.cntgsym.formulario.preferences.PreferenciasUsuario
 import edu.cas.cntgsym.util.Constantes
+import java.io.File
+import java.io.FileOutputStream
 
 class FormularioActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityFormularioBinding
+    lateinit var usuario: Usuario
+
     var lanzadorIntentImagen: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
         //gestionar la vuelta de la selección de foto
@@ -35,7 +40,29 @@ class FormularioActivity : AppCompatActivity() {
             binding.imagenFormulario.scaleType = ImageView.ScaleType.CENTER_CROP
 
 
+            val uriLocal =  copiarImagenAMemoriaInterna(result.data?.data!!)
+            Log.d(Constantes.ETIQUETA_LOG, "Ruta de la copia = $uriLocal ")
+
+            binding.imagenFormulario.tag = uriLocal
+
+
         }
+    }
+
+    fun copiarImagenAMemoriaInterna(uriContent : Uri): Uri {
+        val nombreArchivo = "imagen_formulario_perfil.jpg"
+        //aquí escribo
+        val archivoSalida = File(filesDir, nombreArchivo)
+        val outputStream = FileOutputStream(archivoSalida)//escribir fichero de bytes / reader/writer trabajar con texto
+        //leo
+        val archivoGaleria = contentResolver.openInputStream(uriContent)
+
+
+        archivoGaleria?.copyTo(outputStream)
+        archivoGaleria?.close()
+
+        return Uri.fromFile(archivoSalida)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +91,35 @@ class FormularioActivity : AppCompatActivity() {
         binding.imagenFormulario.setOnClickListener {
             imagen -> seleccionarFoto()
         }
+
+        initiActivity()
+    }
+
+    private fun initiActivity() {
+        //Completar el Estado de la actividad
+        //si tengo fichero de preferencias, lo recuperamos y lo hacemos visible/lo cargamos
+        if (!PreferenciasUsuario.ficheroUsuarioVacio(this))
+        {
+            cargarDatosFichero()
+        } else {
+            Log.d(Constantes.ETIQUETA_LOG, "El fichero está vacío")
+        }
+    }
+
+    fun cargarDatosFichero()
+    {
+        this.usuario = PreferenciasUsuario.cargarUsuario(this)
+        Log.d(Constantes.ETIQUETA_LOG, "Usuario cargado = $usuario")
+        binding.editTextNombreFormulario.setText(this.usuario.nombre)
+        binding.editTextEdadFormulario.setText(this.usuario.edad.toString())
+        if (this.usuario.sexo=='M')
+        {
+            binding.radioButtonHombre.isChecked = true
+        } else {
+            binding.radioButtonMujer.isChecked = true
+        }
+
+        binding.imagenFormulario.setImageURI(this.usuario.uriFoto.toUri())
     }
 
     fun esNombreValido (nombre:String): Boolean
@@ -84,7 +140,8 @@ class FormularioActivity : AppCompatActivity() {
         {
             "" //sin foto
         } else {
-            binding.imagenFormulario.tag as String
+             val uritag = binding.imagenFormulario.tag as Uri
+             uritag.toString()
         }
         val usuario = Usuario(nombre, edad, sexo, uriFoto)
         PreferenciasUsuario.guardarUsuarioPreferences(usuario, this)
@@ -111,7 +168,7 @@ class FormularioActivity : AppCompatActivity() {
 private fun FormularioActivity.seleccionarFoto() {
    //TODO lanzar el intent para seleccionar una foto de la galería/del dispoistivo
     val intentGaleria = Intent(Intent.ACTION_PICK)
-    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//seleccionar un documento
+    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//TODO probar seleccionar un documento
     intentGaleria.type = "image/*" //quiero obtener una foto
 
     if (intentGaleria.resolveActivity(packageManager)!=null)
