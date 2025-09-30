@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -32,6 +33,8 @@ class FotoActivity : AppCompatActivity() {
     lateinit var uriFotoPrivada: Uri //file:// ruta privada de mi foto app
     lateinit var uriFotoPublica: Uri //content:// ruta pública de mi foto app
 
+    val viewModel: FotoViewModel by viewModels()
+
     val launcherIntentFoto = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     {
         resultado ->
@@ -39,6 +42,7 @@ class FotoActivity : AppCompatActivity() {
         {
             Log.d(Constantes.ETIQUETA_LOG, "La foto fue bien")
             binding.fotoTomada.setImageURI(this.uriFotoPublica)
+            viewModel.uriFoto = this.uriFotoPublica
             //acuatlizarGaleria()
         } else {
             Log.d(Constantes.ETIQUETA_LOG, "La foto fue mal")
@@ -60,10 +64,11 @@ class FotoActivity : AppCompatActivity() {
         }
     )
 
-//TODO revisar fallo
-    /*val launcherIntentFoto3 = registerForActivityResult(
+
+    //FotoActivity::postIntentFoto sintaxis Java
+    val launcherIntentFoto3 = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
-        FotoActivity::postIntentFoto //function reference
+        ::postIntentFoto //function reference
     )
 
     fun postIntentFoto (resultado: ActivityResult): Unit
@@ -75,13 +80,13 @@ class FotoActivity : AppCompatActivity() {
         } else {
             Log.d(Constantes.ETIQUETA_LOG, "La foto fue mal")
         }
-    }*/
+    }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         //este métod o se invoca antes de que la activdad muera / antes de recearse
-        outState.putString("URI", this.uriFotoPublica.toString())
+//        outState.putString("URI", this.uriFotoPublica.toString())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +95,11 @@ class FotoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityFotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //si el viewmodel tiene una uri , la cargue en el ImageView
+        viewModel.uriFoto?.let {
+            binding.fotoTomada.setImageURI(it)
+        }
 
     }
 
