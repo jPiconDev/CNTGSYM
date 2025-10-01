@@ -166,9 +166,9 @@ class FormularioActivity : AppCompatActivity() {
 }
 
 private fun FormularioActivity.seleccionarFoto() {
-   //TODO lanzar el intent para seleccionar una foto de la galería/del dispoistivo
+
     val intentGaleria = Intent(Intent.ACTION_PICK)
-    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)//TODO probar seleccionar un documento
+    //val intentGaleria = Intent(Intent.ACTION_GET_CONTENT)
     intentGaleria.type = "image/*" //quiero obtener una foto
 
     if (intentGaleria.resolveActivity(packageManager)!=null)
