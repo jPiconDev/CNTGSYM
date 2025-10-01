@@ -20,6 +20,7 @@ import edu.cas.cntgsym.contactos.SeleccionContactosActivity
 import edu.cas.cntgsym.contactos.SeleccionContactosActivityPermisos
 import edu.cas.cntgsym.util.Constantes
 import androidx.core.content.edit
+import edu.cas.cntgsym.biometrico.BioActivity
 import edu.cas.cntgsym.formulario.FormularioActivity
 import edu.cas.cntgsym.foto.FotoActivity
 import edu.cas.cntgsym.persistenciavector.SpinnerVectorActivity
@@ -49,11 +50,13 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-       // startActivity(Intent(this, SeleccionContactosActivity::class.java))
-       // startActivity(Intent(this, SeleccionContactosActivityPermisos::class.java))
-       // startActivity(Intent(this, SpinnerVectorActivity::class.java))
+        // startActivity(Intent(this, SeleccionContactosActivity::class.java))
+        // startActivity(Intent(this, SeleccionContactosActivityPermisos::class.java))
+        // startActivity(Intent(this, SpinnerVectorActivity::class.java))
         //startActivity(Intent(this, FormularioActivity::class.java))
-        startActivity(Intent(this, FotoActivity::class.java))
+        // startActivity(Intent(this, FotoActivity::class.java))
+        startActivity(Intent(this, BioActivity::class.java))
+        //startActivity()
         //Log.v(Constantes.ETIQUETA_LOG, "PRUEBA LOG VERBOSE")
         //mostrarAppsInstaladas()
         val ficheroPreferencias = getSharedPreferences(Constantes.FICHERO_PREFS_AJUSTES, MODE_PRIVATE)
