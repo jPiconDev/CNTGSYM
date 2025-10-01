@@ -9,6 +9,8 @@ import edu.cas.cntgsym.util.Notificaciones
 
 class InicioMovilReceiver : BroadcastReceiver() {
 
+    //EN LOS PIXEL comportamiento curioso: NO se lanza la señal de boot_completed
+    //si en algunos al instalar
     //mi idea que cuando se inicie el teléfono este métod sea invocado automáticamente
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(Constantes.ETIQUETA_LOG, "en InicioMovilReceiver action = ${intent.action}")

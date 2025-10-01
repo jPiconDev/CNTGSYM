@@ -72,6 +72,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CNTGSYM">
+        <receiver
+            android:name=".descargar.DescargarReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <activity
+            android:name=".descargar.DescargaActivity"
+            android:exported="false" />
         <activity
             android:name=".biometrico.BioActivity"
             android:exported="false" />

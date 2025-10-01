@@ -119,6 +119,13 @@ class BioActivity : AppCompatActivity() {
 
         } else {
             Toast.makeText(this, "Sin PIN o patrón configurados", Toast.LENGTH_LONG).show()
+            //finish()
+            finishAffinity()//con esto cierro mi app
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(Constantes.ETIQUETA_LOG, "ON DESTROY")
     }
 }
