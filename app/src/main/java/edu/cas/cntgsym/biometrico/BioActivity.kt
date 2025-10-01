@@ -1,15 +1,15 @@
 package edu.cas.cntgsym.biometrico
 
+import android.app.KeyguardManager
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import edu.cas.cntgsym.R
 import edu.cas.cntgsym.util.Constantes
 
@@ -17,6 +17,17 @@ class BioActivity : AppCompatActivity() {
 
     lateinit var biometricPrompt: BiometricPrompt //el diálogo
     lateinit var promptInfo: BiometricPrompt.PromptInfo //el mensaje
+
+    val launcherPromptPinOPatron = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {
+        if (it.resultCode == RESULT_OK)
+        {
+            Toast.makeText(this, "Autenticación Correcta", Toast.LENGTH_LONG).show()
+            //TODO darle acceso a la actividad protegida
+        } else {
+            Toast.makeText(this, "Autenticación INCorrecta", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +58,7 @@ class BioActivity : AppCompatActivity() {
                  ->{
                      //PROBAR PATRÓN
                     Log.d(Constantes.ETIQUETA_LOG, "SIN BIOMETRÍA")
+                intentarAutenticacionBasica()
                  }
         }
     }
@@ -73,6 +85,7 @@ class BioActivity : AppCompatActivity() {
                     {
                         //probar con el patrón/pin
                         Log.d(Constantes.ETIQUETA_LOG, "FALLO BIOMETRÍA probar otra")
+                        intentarAutenticacionBasica()
                     }
                 }
 
@@ -89,5 +102,23 @@ class BioActivity : AppCompatActivity() {
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()
+    }
+
+    fun intentarAutenticacionBasica()
+    {
+       //patrón o pin disponible desde la 6 api 23, como nuestra minsdk 24...sin problema
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        if (keyguardManager.isKeyguardSecure)
+        {
+            val intent = keyguardManager.createConfirmDeviceCredentialIntent(
+                "Autenticación Requerida",
+                "Confirma tu pin o contraseña"
+            )
+
+            launcherPromptPinOPatron.launch(intent)
+
+        } else {
+            Toast.makeText(this, "Sin PIN o patrón configurados", Toast.LENGTH_LONG).show()
+        }
     }
 }
