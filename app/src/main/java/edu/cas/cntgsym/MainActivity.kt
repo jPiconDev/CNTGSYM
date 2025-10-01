@@ -21,6 +21,7 @@ import edu.cas.cntgsym.contactos.SeleccionContactosActivityPermisos
 import edu.cas.cntgsym.util.Constantes
 import androidx.core.content.edit
 import edu.cas.cntgsym.biometrico.BioActivity
+import edu.cas.cntgsym.descargar.DescargaActivity
 import edu.cas.cntgsym.formulario.FormularioActivity
 import edu.cas.cntgsym.foto.FotoActivity
 import edu.cas.cntgsym.persistenciavector.SpinnerVectorActivity
@@ -55,7 +56,8 @@ class MainActivity : AppCompatActivity() {
         // startActivity(Intent(this, SpinnerVectorActivity::class.java))
         //startActivity(Intent(this, FormularioActivity::class.java))
         // startActivity(Intent(this, FotoActivity::class.java))
-        startActivity(Intent(this, BioActivity::class.java))
+        //startActivity(Intent(this, BioActivity::class.java))
+        startActivity(Intent(this, DescargaActivity::class.java))
         //startActivity()
         //Log.v(Constantes.ETIQUETA_LOG, "PRUEBA LOG VERBOSE")
         //mostrarAppsInstaladas()

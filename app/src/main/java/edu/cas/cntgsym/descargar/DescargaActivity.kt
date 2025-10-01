@@ -2,10 +2,12 @@ package edu.cas.cntgsym.descargar
 
 import android.app.DownloadManager
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Environment
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -21,6 +23,7 @@ class DescargaActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        descargarCancion()
     }
 
     fun descargarCancion (){
@@ -29,8 +32,15 @@ class DescargaActivity : AppCompatActivity() {
 
         //PREPARO LA DESCARGA REQUEST
         val peticionDescarga = prepararDescarga(urlCancion)
+        //ASOCIAR A MI RECEPTOR QUE ESCUCHE LA SEÑAL DE DESCARGA COMPLETA
+        val receptor =  DescargarReceiver()
+        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        ContextCompat.registerReceiver(this, receptor, intentFilter, ContextCompat.RECEIVER_EXPORTED)
+
         //ACCEDO AL SERVICIO DE DESCARGAS
-        val downloadService = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val idDescarga = downloadManager.enqueue(peticionDescarga)
+        receptor.idDescarga = idDescarga
     }
 
     fun prepararDescarga(urlCancion:String): DownloadManager.Request
