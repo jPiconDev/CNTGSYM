@@ -81,6 +81,11 @@
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"/>
 
+        <receiver android:name=".servicio.PlayService$NotificationCloseButtonHandler" />
+        <receiver android:name=".servicio.PlayService$NotificationPlayButtonHandler" />
+        <receiver android:name=".servicio.PlayService$NotificationPrevButtonHandler" />
+        <receiver android:name=".servicio.PlayService$NotificationSkipButtonHandler" />
+
         <activity
             android:name=".servicio.PlayActivity"
             android:exported="false" />
