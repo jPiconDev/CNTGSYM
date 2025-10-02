@@ -25,6 +25,7 @@ import edu.cas.cntgsym.descargar.DescargaActivity
 import edu.cas.cntgsym.formulario.FormularioActivity
 import edu.cas.cntgsym.foto.FotoActivity
 import edu.cas.cntgsym.persistenciavector.SpinnerVectorActivity
+import edu.cas.cntgsym.servicio.PlayActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -57,7 +58,8 @@ class MainActivity : AppCompatActivity() {
         //startActivity(Intent(this, FormularioActivity::class.java))
         // startActivity(Intent(this, FotoActivity::class.java))
         //startActivity(Intent(this, BioActivity::class.java))
-        startActivity(Intent(this, DescargaActivity::class.java))
+        //startActivity(Intent(this, DescargaActivity::class.java))
+        startActivity(Intent(this, PlayActivity::class.java))
         //startActivity()
         //Log.v(Constantes.ETIQUETA_LOG, "PRUEBA LOG VERBOSE")
         //mostrarAppsInstaladas()

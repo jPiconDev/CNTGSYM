@@ -21,6 +21,9 @@ object Notificaciones {
     const val NOTIFICATION_CHANNEL_ID = "UNO"
     const val NOTIFICATION_CHANNEL_NAME = "CANAL_CNTGSYM"
 
+    const val NOTIFICATION_CHANNEL_ID2 = "DOS"
+    const val NOTIFICATION_CHANNEL_NAME2 = "CANAL_CNTGSYM2"
+
     //lanzar notificación
 
     //crear canal
@@ -114,6 +117,25 @@ object Notificaciones {
         //ADD PERMISOS
         notificationManager.notify(500, notificacion)
         Log.d(Constantes.ETIQUETA_LOG, "Notificación Lanzada")
+
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun crearCanalNotificacionForegroundService (context:Context, id: String, nombre:String): NotificationChannel {
+        var notificationChannel : NotificationChannel? = null
+
+
+
+        notificationChannel = NotificationChannel(
+            id,
+            nombre,
+            NotificationManager.IMPORTANCE_LOW  // IMPORTANTE: usa LOW para servicios persistentes
+        )
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
+        return notificationChannel
 
     }
 }
