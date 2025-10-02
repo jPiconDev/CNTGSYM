@@ -156,6 +156,10 @@ class FotoActivity : AppCompatActivity() {
         val fechaActual = Date()
         val momentoActual = SimpleDateFormat("yyyyMMdd_HHmmss").format(fechaActual)
         val nombreFichero = "FOTO_CNT_$momentoActual.jpg"
+        ///sdcard/Download
+        //var rutaFoto =  "${Environment.getExternalStorageDirectory()?.path}/$nombreFichero" //ruta pública NO SE PUEDE - Security Exception
+        //var rutaFoto =  "${Environment.getExternalStoragePublicDirectory (Environment.DIRECTORY_DOWNLOADS)?.path}/$nombreFichero" //ruta pública de DESCARGAS NO SE PUEDE - Security Exception /storage/emulated/0/Download/FOTO_ADF_20250923_10344 (EXPLORADOR) /storage/sdcard0/Download
+        //var rutaFoto =  "${Environment.getExternalStoragePublicDirectory (Environment.DIRECTORY_DCIM)?.path}/$nombreFichero" //ruta pública de DESCARGAS NO SE PUEDE - Security Exception /storage/emulated/0/DCIM/FOTO_ADF_20250923_10344 (EXPLORADOR) /storage/sdcard0/DCIM
 
         //var rutaFoto = "${filesDir.path}/$nombreFichero" //MEMORIA INTERNA /data file:///data/user/0/edu.cas.cntgsym/files/FOTO_CNT_20250930_185107.jpg
         var rutaFoto =

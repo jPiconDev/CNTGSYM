@@ -2,4 +2,6 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <files-path name="fotoprivada" path="/" /> <!--ruta interna privada "interna"-->
     <external-files-path name="fotopublicaprivada" path="/" /><!--ruta publico-privada "exterena compartida"-->
+    <external-path name="fotopublicadcim"  path="DCIM/"/>
+    <external-path name="fotopublicadownload"  path="Download/"/>
 </paths>
