@@ -83,6 +83,7 @@
 
         <receiver android:name=".servicio.PlayService$NotificationCloseButtonHandler" />
         <receiver android:name=".servicio.PlayService$NotificationPlayButtonHandler" />
+        <receiver android:name=".servicio.PlayService$NotificationPauseButtonHandler" />
         <receiver android:name=".servicio.PlayService$NotificationPrevButtonHandler" />
         <receiver android:name=".servicio.PlayService$NotificationSkipButtonHandler" />
 

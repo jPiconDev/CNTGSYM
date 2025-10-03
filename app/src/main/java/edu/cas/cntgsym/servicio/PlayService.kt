@@ -1,6 +1,7 @@
 package edu.cas.cntgsym.servicio
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -11,6 +12,7 @@ import android.os.Build
 import android.os.IBinder
 import android.provider.Browser
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
@@ -29,58 +31,134 @@ class PlayService : Service() {
         // metodo
         var mediaPlayer: MediaPlayer? = null//ExoPlayer
         var sonando: Boolean = false //para controlar el estado de reprodución
+        var pausado: Boolean = false
+        var serviceInstance: PlayService? = null  // Referencia al servicio
+
 
         fun play(context: Context)
         {
+            Log.d("PlayService", "Función play() llamada. Sonando: $sonando")
+
             if (!sonando)
             {
-                mediaPlayer = MediaPlayer.create(context, R.raw.audio)
-                mediaPlayer!!.start()
-                sonando=true
+                // Si ya está creado y pausado, reanudamos
+                if (mediaPlayer != null && pausado) {
+                    mediaPlayer?.start()
+                    sonando = true
+                    pausado = false
+                } else {
+                    // Si no está creado, lo creamos
+                    mediaPlayer = MediaPlayer.create(context, R.raw.audio)
+                    mediaPlayer?.start()
+                    sonando = true
+                    pausado = false
+                }
+
+                // Actualizo la notificación
+                serviceInstance?.updateNotification()
+
+                Log.d("PlayService", "MediaPlayer creado correctamente.")
+
+                // controlo cuando termine el audio
                 mediaPlayer!!.setOnCompletionListener {
                     //detener la canción
+                    Log.d("PlayService", "Canción terminada.")
                     sonando = false
                     val intent = Intent(context, PlayService::class.java)
                     context.stopService(intent)
                 }
+            } else {
+                Log.e("PlayService", "Error: MediaPlayer es null, archivo no encontrado o no se pudo crear.")
+            }
+        }
+
+        fun pause(context: Context) {
+            if (sonando && mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.pause()
+                sonando = false
+                pausado = true
+
+                // Actualizo la notificación
+                serviceInstance?.updateNotification()
+
+                Log.d("PlayService", "MediaPlayer pausado correctamente.")
             }
         }
 
         fun stop(context: Context)
         {
-            mediaPlayer!!.stop()
-            sonando=false
-            mediaPlayer=null
+            Log.d("PlayService", "Función stop() llamada. Sonando: $sonando, MediaPlayer: $mediaPlayer")
+
+            if (sonando && mediaPlayer != null) {
+                mediaPlayer!!.stop()
+                sonando=false
+                mediaPlayer=null
+                Log.d("PlayService", "Música detenida y recursos liberados.")
+            } else {
+                Log.d("PlayService", "No se pudo detener: sonando=$sonando, mediaPlayer=$mediaPlayer")
+            }
             //paro el servicio
             // OJO añadido en esta implementación
             val intent = Intent(context, PlayService::class.java)
             context.stopService(intent)
         }
+
     }
-
-
 
     override fun onCreate() {
         super.onCreate()
         Log.d(Constantes.ETIQUETA_LOG, "En onCreate() de PlayServicio")
     }
 
+    private fun updateNotification() {
+        val notification = buildNotification()
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(205, notification)
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(Constantes.ETIQUETA_LOG, "En onStartCommand() de PlayServicio")
+        serviceInstance = this  // Guardar referencia
+        val notification = buildNotification()
+        //lanzo el servicio haciendo visible la notificación
+        //y la actividad de reproducción
+        startForeground(205, notification)
+        play(this)
+
+        return START_STICKY//en el caso de que se pare el servicio, no se reinicia
+    }
+
+    private fun buildNotification(): Notification {
         //return
         //super.onStartCommand(intent, flags, startId)
-        Log.d(Constantes.ETIQUETA_LOG, "En onStartCommand() de PlayServicio")
+
 
         //la apariencia personalizada de la notificación
         val notificacionPersonalizada = RemoteViews(this.packageName, R.layout.controles_reproductor)
 
         val piPlay = crearPedingIntent(this, NotificationPlayButtonHandler::class.java, 105 )
-        val piSkip = crearPedingIntent(this, NotificationSkipButtonHandler::class.java, 110 )
-        val piClose = crearPedingIntent(this, NotificationCloseButtonHandler::class.java, 115 )
-        val piPrev = crearPedingIntent(this, NotificationPrevButtonHandler::class.java, 120 )
+        val piPause = crearPedingIntent(this, NotificationPauseButtonHandler::class.java, 110 )
+        val piSkip = crearPedingIntent(this, NotificationSkipButtonHandler::class.java, 115 )
+        val piClose = crearPedingIntent(this, NotificationCloseButtonHandler::class.java, 120 )
+        val piPrev = crearPedingIntent(this, NotificationPrevButtonHandler::class.java, 125 )
 
         val piMainActivity = obtenerPendingIntentActivity()
 
+        // Muestro u oculto botones según el estado
+        if (sonando) {
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_play, View.GONE)
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_pause, View.VISIBLE)
+        } else if (pausado) {
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_play, View.VISIBLE)
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_pause, View.GONE)
+        } else {
+            // Si no está sonando ni pausado (detenido)
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_play, View.VISIBLE)
+            notificacionPersonalizada.setViewVisibility(R.id.notification_button_pause, View.GONE)
+        }
+
         notificacionPersonalizada.setOnClickPendingIntent(R.id.notification_button_play, piPlay)
+        notificacionPersonalizada.setOnClickPendingIntent(R.id.notification_button_pause, piPause)
         notificacionPersonalizada.setOnClickPendingIntent(R.id.notification_button_close, piClose)
         notificacionPersonalizada.setOnClickPendingIntent(R.id.notification_button_prev, piPrev)
         notificacionPersonalizada.setOnClickPendingIntent(R.id.notification_button_skip, piSkip)
@@ -91,8 +169,7 @@ class PlayService : Service() {
         }
 
         //Genero la Notificación
-        val notification: Notification =
-            NotificationCompat.Builder(this, Notificaciones.NOTIFICATION_CHANNEL_ID2)
+        return NotificationCompat.Builder(this, Notificaciones.NOTIFICATION_CHANNEL_ID2)
                 .setContentTitle("Player segundo plano")
                 .setTicker("Player segundo plano")
                 .setContentText("Música maestro")
@@ -102,21 +179,16 @@ class PlayService : Service() {
                 .setContentIntent(piMainActivity) //la actividad a la que llamaremos si tocan la notificación
                 .build() // y se hace
 
-        //lanzo el servicio haciendo visible la notificación
-        //y la actividad de reproducción
-        startForeground(205, notification)
-        play(this)
 
-
-        return START_STICKY//en el caso de que se pare el servicio, no se reinicia
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        stop(this)
+        serviceInstance = null
         Log.d(Constantes.ETIQUETA_LOG, "En onDestroy() de PlayServicio")
         Toast.makeText(this, "Parando servicio onDestroy", Toast.LENGTH_SHORT).show()
     }
-
 
     override fun onBind(intent: Intent): IBinder? {
         //esto sólo sería necesario programarlo si mi servicio actualiza una pantalla o similar
@@ -133,7 +205,6 @@ class PlayService : Service() {
             this, 100, notificationIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
-
 
         return intentActivity
     }
@@ -166,7 +237,6 @@ class PlayService : Service() {
     }
 
 
-
     //esta clase recibirá la señal de reproducir la notificación
     class NotificationPlayButtonHandler : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -175,6 +245,13 @@ class PlayService : Service() {
         }
     }
 
+    //esta clase recibirá la señal de pausar la notificación
+    class NotificationPauseButtonHandler : BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Toast.makeText(context, "Botón Pause seleccionado", Toast.LENGTH_SHORT).show()
+            pause(context!!)
+        }
+    }
 
     //esta clase recibirá la señal de hacia delante la notificación
     class NotificationSkipButtonHandler : BroadcastReceiver(){

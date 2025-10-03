@@ -21,9 +21,9 @@ class PlayActivity : AppCompatActivity() {
         this.startButton = findViewById<Button>(R.id.botonstart)
         this.stopButton = findViewById<Button>(R.id.botonstop)
 
-        //TODO programad los listener on click sobre los botones de 3 maneras
-        //1 con una clase anónima
-        // 1. Clase anónima
+        //TODO programad los listener on click sobre los botones de 3 maneras:
+
+        // 1. con una clase anónima
         startButton.setOnClickListener(object : android.view.View.OnClickListener {
             override fun onClick(v: android.view.View?) {
                 // Iniciar el servicio
@@ -38,9 +38,42 @@ class PlayActivity : AppCompatActivity() {
                 stopService(intent)
             }
         })
-        //2 con una función anónima
-        //3 con una función lambda
-        //4 con una function reference
 
+        // 2. con una función anónima
+        /*startButton.setOnClickListener(fun(v: android.view.View?) {
+            val intent = Intent(this@PlayActivity, PlayService::class.java)
+            startService(intent)
+        })
+
+        stopButton.setOnClickListener(fun(v: android.view.View?) {
+            val intent = Intent(this@PlayActivity, PlayService::class.java)
+            stopService(intent)
+        })*/
+
+        // 3. con una función lambda
+        /*startButton.setOnClickListener {
+            val intent = Intent(this@PlayActivity, PlayService::class.java)
+            startService(intent)
+        }
+
+        stopButton.setOnClickListener {
+            val intent = Intent(this@PlayActivity, PlayService::class.java)
+            stopService(intent)
+        }*/
+
+        // 4. con una function reference
+        // startButton.setOnClickListener(this::startServiceClick)
+        // stopButton.setOnClickListener(this::stopServiceClick)
+    }
+
+    // Funciones reference para el método 4
+    fun startServiceClick(v: android.view.View?) {
+        val intent = Intent(this@PlayActivity, PlayService::class.java)
+        startService(intent)
+    }
+
+    fun stopServiceClick(v: android.view.View?) {
+        val intent = Intent(this@PlayActivity, PlayService::class.java)
+        stopService(intent)
     }
 }
